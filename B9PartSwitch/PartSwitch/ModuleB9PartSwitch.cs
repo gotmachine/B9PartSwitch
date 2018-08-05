@@ -106,6 +106,17 @@ namespace B9PartSwitch
         public float Scale => scale;
         public float VolumeScale => scale * scale * scale;
 
+        public bool ManagesMaxTemp => subtypes.Any(subtype => subtype.ManagesMaxTemp);
+        public bool ManagesSkinMaxTemp => subtypes.Any(subtype => subtype.ManagesSkinMaxTemp);
+        public bool ManagesCrashTolerance => subtypes.Any(subtype => subtype.ManagesCrashTolerance);
+        public bool ManagesAttachNode => subtypes.Any(subtype => subtype.ManagesAttachNode);
+        public bool ManagesCoMOffset => subtypes.Any(subtype => subtype.ManagesCoMOffset);
+        public bool ManagesCoPOffset => subtypes.Any(subtype => subtype.ManagesCoPOffset);
+        public bool ManagesCoLOffset => subtypes.Any(subtype => subtype.ManagesCoLOffset);
+        public bool ManagesCenterOfBuoyancy => subtypes.Any(subtype => subtype.ManagesCenterOfBuoyancy);
+        public bool ManagesCenterOfDisplacement => subtypes.Any(subtype => subtype.ManagesCenterOfDisplacement);
+        public bool ManagesStackSymmetry => subtypes.Any(subtype => subtype.ManagesStackSymmetry);
+
         #endregion
 
         #region Setup
@@ -255,8 +266,6 @@ namespace B9PartSwitch
 
         public bool IsManagedMaterial(Material material) => ManagedMaterials.Contains(material);
 
-        public bool PartFieldManaged(ISubtypePartField field) => subtypes.Any(subtype => field.ShouldUseOnSubtype(subtype.Context));
-
         public void AddChild(ModuleB9PartSwitch child)
         {
             child.ThrowIfNullArgument(nameof(child));
@@ -356,7 +365,7 @@ namespace B9PartSwitch
                 }
             }
 
-            if (PartFieldManaged(SubtypePartFields.SrfAttachNode) && !part.attachRules.allowSrfAttach || part.srfAttachNode.IsNull())
+            if (subtypes.Any(subtype => subtype.attachNode.IsNotNull()) && !part.attachRules.allowSrfAttach || part.srfAttachNode.IsNull())
             {
                 LogError($"Error: One or more subtypes have an attach node defined, but part does not allow surface attachment (or the surface attach node could not be found)");
                 subtypes.ForEach(subtype => subtype.ClearAttachNode());
@@ -479,13 +488,70 @@ namespace B9PartSwitch
                     }
                 }
 
-                foreach (ISubtypePartField field in SubtypePartFields.All)
+                if (ManagesMaxTemp && otherModule.ManagesMaxTemp)
                 {
-                    if (PartFieldManaged(field) && otherModule.PartFieldManaged(field))
-                    {
-                        LogError($"Two {nameof(ModuleB9PartSwitch)} modules cannot both manage the part's {field.Name}");
-                        destroy = true;
-                    }
+                    LogError("More than module is managing the part's maxTemp");
+                    destroy = true;
+                }
+
+                if (ManagesSkinMaxTemp && otherModule.ManagesSkinMaxTemp)
+                {
+                    LogError("More than module is managing the part's skinMaxTemp");
+                    destroy = true;
+                }
+
+                if (ManagesCrashTolerance && otherModule.ManagesCrashTolerance)
+                {
+                    LogError("More than module is managing the part's crashTolerance");
+                    destroy = true;
+                }
+
+                if (ManagesCrashTolerance && otherModule.ManagesCrashTolerance)
+                {
+                    LogError("More than module is managing the part's crashTolerance");
+                    destroy = true;
+                }
+
+                if (ManagesAttachNode && otherModule.ManagesAttachNode)
+                {
+                    LogError("More than module is managing the part's srfAttachNode");
+                    destroy = true;
+                }
+
+                if (ManagesCoMOffset && otherModule.ManagesCoMOffset)
+                {
+                    LogError("More than module is managing the part's CoMOffset");
+                    destroy = true;
+                }
+
+                if (ManagesCoPOffset && otherModule.ManagesCoPOffset)
+                {
+                    LogError("More than module is managing the part's CoPOffset");
+                    destroy = true;
+                }
+
+                if (ManagesCoLOffset && otherModule.ManagesCoLOffset)
+                {
+                    LogError("More than module is managing the part's CoLOffset");
+                    destroy = true;
+                }
+
+                if (ManagesCenterOfBuoyancy && otherModule.ManagesCenterOfBuoyancy)
+                {
+                    LogError("More than module is managing the part's CenterOfBuoyancy");
+                    destroy = true;
+                }
+
+                if (ManagesCenterOfDisplacement && otherModule.ManagesCenterOfDisplacement)
+                {
+                    LogError("More than module is managing the part's CenterOfDisplacement");
+                    destroy = true;
+                }
+
+                if (ManagesStackSymmetry && otherModule.ManagesStackSymmetry)
+                {
+                    LogError("More than module is managing the part's stackSymmetry");
+                    destroy = true;
                 }
 
                 if (destroy)
