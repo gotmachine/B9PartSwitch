@@ -106,16 +106,8 @@ namespace B9PartSwitch
         public float Scale => scale;
         public float VolumeScale => scale * scale * scale;
 
-        public bool ManagesMaxTemp => subtypes.Any(subtype => subtype.ManagesMaxTemp);
-        public bool ManagesSkinMaxTemp => subtypes.Any(subtype => subtype.ManagesSkinMaxTemp);
-        public bool ManagesCrashTolerance => subtypes.Any(subtype => subtype.ManagesCrashTolerance);
-        public bool ManagesAttachNode => subtypes.Any(subtype => subtype.ManagesAttachNode);
-        public bool ManagesCoMOffset => subtypes.Any(subtype => subtype.ManagesCoMOffset);
-        public bool ManagesCoPOffset => subtypes.Any(subtype => subtype.ManagesCoPOffset);
-        public bool ManagesCoLOffset => subtypes.Any(subtype => subtype.ManagesCoLOffset);
-        public bool ManagesCenterOfBuoyancy => subtypes.Any(subtype => subtype.ManagesCenterOfBuoyancy);
-        public bool ManagesCenterOfDisplacement => subtypes.Any(subtype => subtype.ManagesCenterOfDisplacement);
-        public bool ManagesStackSymmetry => subtypes.Any(subtype => subtype.ManagesStackSymmetry);
+        public IEnumerable<object> PartAspectLocks => subtypes.SelectMany(subtype => subtype.PartAspectLocks);
+        public IEnumerable<object> PartAspectLocksOnOtherModules => part.Modules.OfType<ModuleB9PartSwitch>().Where(module => module != this).SelectMany(module => module.PartAspectLocks);
 
         #endregion
 
@@ -309,6 +301,8 @@ namespace B9PartSwitch
             CurrentSubtype.OnWasCopiedActiveSubtype();
         }
 
+        public bool HasPartAspectLock(object partAspectLock) => PartAspectLocks.Contains(PartAspectLocks);
+
         #endregion
 
         #region Private Methods
@@ -486,72 +480,6 @@ namespace B9PartSwitch
                         LogError($"Two {nameof(ModuleB9PartSwitch)} modules cannot manage the same material: {material.name}");
                         destroy = true;
                     }
-                }
-
-                if (ManagesMaxTemp && otherModule.ManagesMaxTemp)
-                {
-                    LogError("More than module is managing the part's maxTemp");
-                    destroy = true;
-                }
-
-                if (ManagesSkinMaxTemp && otherModule.ManagesSkinMaxTemp)
-                {
-                    LogError("More than module is managing the part's skinMaxTemp");
-                    destroy = true;
-                }
-
-                if (ManagesCrashTolerance && otherModule.ManagesCrashTolerance)
-                {
-                    LogError("More than module is managing the part's crashTolerance");
-                    destroy = true;
-                }
-
-                if (ManagesCrashTolerance && otherModule.ManagesCrashTolerance)
-                {
-                    LogError("More than module is managing the part's crashTolerance");
-                    destroy = true;
-                }
-
-                if (ManagesAttachNode && otherModule.ManagesAttachNode)
-                {
-                    LogError("More than module is managing the part's srfAttachNode");
-                    destroy = true;
-                }
-
-                if (ManagesCoMOffset && otherModule.ManagesCoMOffset)
-                {
-                    LogError("More than module is managing the part's CoMOffset");
-                    destroy = true;
-                }
-
-                if (ManagesCoPOffset && otherModule.ManagesCoPOffset)
-                {
-                    LogError("More than module is managing the part's CoPOffset");
-                    destroy = true;
-                }
-
-                if (ManagesCoLOffset && otherModule.ManagesCoLOffset)
-                {
-                    LogError("More than module is managing the part's CoLOffset");
-                    destroy = true;
-                }
-
-                if (ManagesCenterOfBuoyancy && otherModule.ManagesCenterOfBuoyancy)
-                {
-                    LogError("More than module is managing the part's CenterOfBuoyancy");
-                    destroy = true;
-                }
-
-                if (ManagesCenterOfDisplacement && otherModule.ManagesCenterOfDisplacement)
-                {
-                    LogError("More than module is managing the part's CenterOfDisplacement");
-                    destroy = true;
-                }
-
-                if (ManagesStackSymmetry && otherModule.ManagesStackSymmetry)
-                {
-                    LogError("More than module is managing the part's stackSymmetry");
-                    destroy = true;
                 }
 
                 if (destroy)
