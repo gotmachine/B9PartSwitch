@@ -117,6 +117,7 @@
     <Compile Include="TankSettings\TankTypeValueParser.cs" />
     <Compile Include="Test\ModuleB9PartSwitchTest.cs" />
     <Compile Include="Test\PartModuleTest.cs" />
+    <Compile Include="PartSwitch\PartModuleSwitchInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
